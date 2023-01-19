@@ -18,20 +18,12 @@
         myClasses[i].style.display = 'none';
       }
 	}
-    // Copyright (c) 2014 The Chromium Authors. All rights reserved.
-    // Use of this source code is governed by a BSD-style license that can be
-    // found in the LICENSE file.
+    
     (function() {
     'use strict';
-    /**
-    * T-Rex runner.
-    * @param {string} outerContainerId Outer containing element id.f
-    * @param {object} opt_config
-    * @constructor
-    * @export
-    */
+   
     function Runner(outerContainerId, opt_config) {
-    // Singleton
+   
     if (Runner.instance_) {
     return Runner.instance_;
     }
@@ -58,40 +50,31 @@
     this.paused = false;
     this.resizeTimerId_ = null;
     this.playCount = 0;
-    // Sound FX.
+  
     this.audioBuffer = null;
     this.soundFx = {};
-    // Global web audio context for playing sounds.
+   
     this.audioContext = null;
-    // Images.
+    
     this.images = {};
     this.imagesLoaded = 0;
     this.loadImages();
     }
     window['Runner'] = Runner;
-    /**
-    * Default game width.
-    * @const
-    */
+    
     var DEFAULT_WIDTH = 600;
-    /**
-    * Frames per second.
-    * @const
-    */
+   
     var FPS = 60;
-    /** @const */
+=
     var IS_HIDPI = window.devicePixelRatio > 1;
-    /** @const */
+   
     var IS_IOS =
     window.navigator.userAgent.indexOf('UIWebViewForStaticFileContent') > -1;
-    /** @const */
+
     var IS_MOBILE = window.navigator.userAgent.indexOf('Mobi') > -1 || IS_IOS;
-    /** @const */
+
     var IS_TOUCH_ENABLED = 'ontouchstart' in window;
-    /**
-    * Default game configuration.
-    * @enum {number}
-    */
+ 
     Runner.config = {
     ACCELERATION: 0.001,
     BG_CLOUD_SPEED: 0.2,
@@ -111,18 +94,12 @@
     SPEED: 6,
     SPEED_DROP_COEFFICIENT: 3
     };
-    /**
-    * Default dimensions.
-    * @enum {string}
-    */
+  
     Runner.defaultDimensions = {
     WIDTH: DEFAULT_WIDTH,
     HEIGHT: 150
     };
-    /**
-    * CSS class names.
-    * @enum {string}
-    */
+  
     Runner.classes = {
     CANVAS: 'runner-canvas',
     CONTAINER: 'runner-container',
@@ -130,10 +107,7 @@
     ICON: 'icon-offline',
     TOUCH_CONTROLLER: 'controller'
     };
-    /**
-    * Image source urls.
-    * @enum {array.<object>}
-    */
+  
     Runner.imageSources = {
     LDPI: [
     {name: 'CACTUS_LARGE', id: '1x-obstacle-large'},
@@ -154,28 +128,19 @@
     {name: 'TREX', id: '2x-trex'}
     ]
     };
-    /**
-    * Sound FX. Reference to the ID of the audio tag on interstitial page.
-    * @enum {string}
-    */
+  
     Runner.sounds = {
     BUTTON_PRESS: 'offline-sound-press',
     HIT: 'offline-sound-hit',
     SCORE: 'offline-sound-reached'
     };
-    /**
-    * Key code mapping.
-    * @enum {object}
-    */
+ 
     Runner.keycodes = {
-    JUMP: {'38': 1, '32': 1}, // Up, spacebar
-    DUCK: {'40': 1}, // Down
-    RESTART: {'13': 1} // Enter
+    JUMP: {'38': 1, '32': 1},
+    DUCK: {'40': 1},
+    RESTART: {'13': 1}
     };
-    /**
-    * Runner event names.
-    * @enum {string}
-    */
+  
     Runner.events = {
     ANIM_END: 'webkitAnimationEnd',
     CLICK: 'click',
@@ -192,11 +157,7 @@
     LOAD: 'load'
     };
     Runner.prototype = {
-    /**
-    * Setting individual settings for debugging.
-    * @param {string} setting
-    * @param {*} value
-    */
+  
     updateConfigSetting: function(setting, value) {
     if (setting in this.config && value != undefined) {
     this.config[setting] = value;
@@ -215,9 +176,7 @@
     }
     }
     },
-    /**
-    * Load and cache the image assets from the page.
-    */
+  
     loadImages: function() {
     var imageSources = IS_HIDPI ? Runner.imageSources.HDPI :
     Runner.imageSources.LDPI;
@@ -228,9 +187,7 @@
     }
     this.init();
     },
-    /**
-    * Load and decode base 64 encoded sounds.
-    */
+  
     loadSounds: function() {
     if (!IS_IOS) {
     this.audioContext = new AudioContext();
@@ -248,13 +205,10 @@
     }
     }
     },
-    /**
-    * Sets the game speed. Adjust the speed accordingly if on a smaller screen.
-    * @param {number} opt_speed
-    */
+  
     setSpeed: function(opt_speed) {
     var speed = opt_speed || this.currentSpeed;
-    // Reduce the speed on smaller mobile screens.
+
     if (this.dimensions.WIDTH < DEFAULT_WIDTH) {
     var mobileSpeed = speed * this.dimensions.WIDTH / DEFAULT_WIDTH *
     this.config.MOBILE_SPEED_COEFFICIENT;
@@ -263,30 +217,28 @@
     this.currentSpeed = opt_speed;
     }
     },
-    /**
-    * Game initialiser.
-    */
+   
     init: function() {
-    // Hide the static icon.
+    
     //document.querySelector('.' + Runner.classes.ICON).style.visibility = 'hidden';
     this.adjustDimensions();
     this.setSpeed();
     this.containerEl = document.createElement('div');
     this.containerEl.className = Runner.classes.CONTAINER;
-    // Player canvas container.
+  
     this.canvas = createCanvas(this.containerEl, this.dimensions.WIDTH,
     this.dimensions.HEIGHT, Runner.classes.PLAYER);
     this.canvasCtx = this.canvas.getContext('2d');
     this.canvasCtx.fillStyle = '#f7f7f7';
     this.canvasCtx.fill();
     Runner.updateCanvasScaling(this.canvas);
-    // Horizon contains clouds, obstacles and the ground.
+ 
     this.horizon = new Horizon(this.canvas, this.images, this.dimensions,
     this.config.GAP_COEFFICIENT);
-    // Distance meter
+
     this.distanceMeter = new DistanceMeter(this.canvas,
     this.images.TEXT_SPRITE, this.dimensions.WIDTH);
-    // Draw t-rex
+   
     this.tRex = new Trex(this.canvas, this.images.TREX);
     this.outerContainerEl.appendChild(this.containerEl);
     if (IS_MOBILE) {
@@ -297,25 +249,19 @@
     window.addEventListener(Runner.events.RESIZE,
     this.debounceResize.bind(this));
     },
-    /**
-    * Create the touch controller. A div that covers whole screen.
-    */
+ 
     createTouchController: function() {
     this.touchController = document.createElement('div');
     this.touchController.className = Runner.classes.TOUCH_CONTROLLER;
     },
-    /**
-    * Debounce the resize event.
-    */
+ 
     debounceResize: function() {
     if (!this.resizeTimerId_) {
     this.resizeTimerId_ =
     setInterval(this.adjustDimensions.bind(this), 250);
     }
     },
-    /**
-    * Adjust game space dimensions on resize.
-    */
+ 
     adjustDimensions: function() {
     clearInterval(this.resizeTimerId_);
     this.resizeTimerId_ = null;
@@ -323,7 +269,7 @@
     var padding = Number(boxStyles.paddingLeft.substr(0,
     boxStyles.paddingLeft.length - 2));
     this.dimensions.WIDTH = this.outerContainerEl.offsetWidth - padding * 2;
-    // Redraw the elements back onto the canvas.
+   
     if (this.canvas) {
     this.canvas.width = this.dimensions.WIDTH;
     this.canvas.height = this.dimensions.HEIGHT;
@@ -332,7 +278,7 @@
     this.clearCanvas();
     this.horizon.update(0, 0, true);
     this.tRex.update(0);
-    // Outer container and distance meter.
+   
     if (this.activated || this.crashed) {
     this.containerEl.style.width = this.dimensions.WIDTH + 'px';
     this.containerEl.style.height = this.dimensions.HEIGHT + 'px';
@@ -341,22 +287,19 @@
     } else {
     this.tRex.draw(0, 0);
     }
-    // Game over panel.
+    
     if (this.crashed && this.gameOverPanel) {
     this.gameOverPanel.updateDimensions(this.dimensions.WIDTH);
     this.gameOverPanel.draw();
     }
     }
     },
-    /**
-    * Play the game intro.
-    * Canvas container width expands out to the full width.
-    */
+   
     playIntro: function() {
     if (!this.started && !this.crashed) {
     this.playingIntro = true;
     this.tRex.playingIntro = true;
-    // CSS animation definition.
+   
     var keyframes = '@-webkit-keyframes intro { ' +
     'from { width:' + Trex.config.WIDTH + 'px }' +
     'to { width: ' + this.dimensions.WIDTH + 'px }' +
@@ -375,16 +318,14 @@
     this.restart();
     }
     },
-    /**
-    * Update the game status to started.
-    */
+   
     startGame: function() {
     this.runningTime = 0;
     this.playingIntro = false;
     this.tRex.playingIntro = false;
     this.containerEl.style.webkitAnimation = '';
     this.playCount++;
-    // Handle tabbing off the page. Pause the current game.
+  
     window.addEventListener(Runner.events.VISIBILITY,
     this.onVisibilityChange.bind(this));
     window.addEventListener(Runner.events.BLUR,
@@ -396,9 +337,7 @@
     this.canvasCtx.clearRect(0, 0, this.dimensions.WIDTH,
     this.dimensions.HEIGHT);
     },
-    /**
-    * Update the game frame.
-    */
+  
     update: function() {
     this.drawPending = false;
     var now = getTimeStamp();
@@ -411,18 +350,18 @@
     }
     this.runningTime += deltaTime;
     var hasObstacles = this.runningTime > this.config.CLEAR_TIME;
-    // First jump triggers the intro.
+    
     if (this.tRex.jumpCount == 1 && !this.playingIntro) {
     this.playIntro();
     }
-    // The horizon doesn't move until the intro is over.
+    
     if (this.playingIntro) {
     this.horizon.update(0, this.currentSpeed, hasObstacles);
     } else {
     deltaTime = !this.started ? 0 : deltaTime;
     this.horizon.update(deltaTime, this.currentSpeed, hasObstacles);
     }
-    // Check for collisions.
+   
     var collision = hasObstacles &&
     checkForCollision(this.horizon.obstacles[0], this.tRex);
     if (!collision) {
@@ -448,9 +387,7 @@
     this.raq();
     }
     },
-    /**
-    * Event handler.
-    */
+ 
     handleEvent: function(e) {
     return (function(evtType, events) {
     switch (evtType) {
@@ -467,15 +404,13 @@
     }
     }.bind(this))(e.type, Runner.events);
     },
-    /**
-    * Bind relevant key / mouse / touch listeners.
-    */
+  
     startListening: function() {
-    // Keys.
+    // Keys
     document.addEventListener(Runner.events.KEYDOWN, this);
     document.addEventListener(Runner.events.KEYUP, this);
     if (IS_MOBILE) {
-    // Mobile only touch devices.
+    // Mobile 
     this.touchController.addEventListener(Runner.events.TOUCHSTART, this);
     this.touchController.addEventListener(Runner.events.TOUCHEND, this);
     this.containerEl.addEventListener(Runner.events.TOUCHSTART, this);
@@ -485,9 +420,7 @@
     document.addEventListener(Runner.events.MOUSEUP, this);
     }
     },
-    /**
-    * Remove all listeners.
-    */
+  
     stopListening: function() {
     document.removeEventListener(Runner.events.KEYDOWN, this);
     document.removeEventListener(Runner.events.KEYUP, this);
@@ -500,10 +433,7 @@
     document.removeEventListener(Runner.events.MOUSEUP, this);
     }
     },
-    /**
-    * Process keydown.
-    * @param {Event} e
-    */
+  
     onKeyDown: function(e) {
     if (e.target != this.detailsButton) {
     if (!this.crashed && (Runner.keycodes.JUMP[String(e.keyCode)] ||
@@ -522,16 +452,13 @@
     this.restart();
     }
     }
-    // Speed drop, activated only when jump key is not pressed.
+   
     if (Runner.keycodes.DUCK[e.keyCode] && this.tRex.jumping) {
     e.preventDefault();
     this.tRex.setSpeedDrop();
     }
     },
-    /**
-    * Process key up.
-    * @param {Event} e
-    */
+   
     onKeyUp: function(e) {
     var keyCode = String(e.keyCode);
     var isjumpKey = Runner.keycodes.JUMP[keyCode] ||
@@ -542,7 +469,7 @@
     } else if (Runner.keycodes.DUCK[keyCode]) {
     this.tRex.speedDrop = false;
     } else if (this.crashed) {
-    // Check that enough time has elapsed before allowing jump key to restart.
+    
     var deltaTime = getTimeStamp() - this.time;
     if (Runner.keycodes.RESTART[keyCode] ||
     (e.type == Runner.events.MOUSEUP && e.target == this.canvas) ||
@@ -554,25 +481,18 @@
     this.play();
     }
     },
-    /**
-    * RequestAnimationFrame wrapper.
-    */
+   
     raq: function() {
     if (!this.drawPending) {
     this.drawPending = true;
     this.raqId = requestAnimationFrame(this.update.bind(this));
     }
     },
-    /**
-    * Whether the game is running.
-    * @return {boolean}
-    */
+  
     isRunning: function() {
     return !!this.raqId;
     },
-    /**
-    * Game over state.
-    */
+   
     gameOver: function() {
     this.playSound(this.soundFx.HIT);
     vibrate(200);
@@ -629,9 +549,7 @@
     this.update();
     }
     },
-    /**
-    * Pause the game if the tab is not in focus.
-    */
+   
     onVisibilityChange: function(e) {
     if (document.hidden || document.webkitHidden || e.type == 'blur') {
     this.stop();
@@ -639,10 +557,7 @@
     this.play();
     }
     },
-    /**
-    * Play a sound.
-    * @param {SoundBuffer} soundBuffer
-    */
+    
     playSound: function(soundBuffer) {
     if (soundBuffer) {
     var sourceNode = this.audioContext.createBufferSource();
@@ -652,19 +567,7 @@
     }
     }
     };
-    /**
-    * Updates the canvas size taking into
-    * account the backing store pixel ratio and
-    * the device pixel ratio.
-    *
-    * See article by Paul Lewis:
-    * https://www.html5rocks.com/en/tutorials/canvas/hidpi/
-    *
-    * @param {HTMLCanvasElement} canvas
-    * @param {number} opt_width
-    * @param {number} opt_height
-    * @return {boolean} Whether the canvas was scaled.
-    */
+    
     Runner.updateCanvasScaling = function(canvas, opt_width, opt_height) {
     var context = canvas.getContext('2d');
     // Query the various pixel ratios
@@ -679,39 +582,22 @@
     canvas.height = oldHeight * ratio;
     canvas.style.width = oldWidth + 'px';
     canvas.style.height = oldHeight + 'px';
-    // Scale the context to counter the fact that we've manually scaled
-    // our canvas element.
+   
     context.scale(ratio, ratio);
     return true;
     }
     return false;
     };
-    /**
-    * Get random number.
-    * @param {number} min
-    * @param {number} max
-    * @param {number}
-    */
+  
     function getRandomNum(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-    /**
-    * Vibrate on mobile devices.
-    * @param {number} duration Duration of the vibration in milliseconds.
-    */
-    function vibrate(duration) {
+  ction vibrate(duration) {
     if (IS_MOBILE && window.navigator.vibrate) {
     window.navigator.vibrate(duration);
     }
     }
-    /**
-    * Create canvas element.
-    * @param {HTMLElement} container Element to append canvas to.
-    * @param {number} width
-    * @param {number} height
-    * @param {string} opt_classname
-    * @return {HTMLCanvasElement}
-    */
+    
     function createCanvas(container, width, height, opt_classname) {
     var canvas = document.createElement('canvas');
     canvas.className = opt_classname ? Runner.classes.CANVAS + ' ' +
@@ -721,10 +607,7 @@
     container.appendChild(canvas);
     return canvas;
     }
-    /**
-    * Decodes the base 64 audio to ArrayBuffer used by Web Audio.
-    * @param {string} base64String
-    */
+  
     function decodeBase64ToArrayBuffer(base64String) {
     var len = (base64String.length / 4) * 3;
     var str = atob(base64String);
@@ -735,22 +618,11 @@
     }
     return bytes.buffer;
     }
-    /**
-    * Return the current timestamp.
-    * @return {number}
-    */
+ 
     function getTimeStamp() {
     return IS_IOS ? new Date().getTime() : performance.now();
     }
-    //******************************************************************************
-    /**
-    * Game over panel.
-    * @param {!HTMLCanvasElement} canvas
-    * @param {!HTMLImage} textSprite
-    * @param {!HTMLImage} restartImg
-    * @param {!Object} dimensions Canvas dimensions.
-    * @constructor
-    */
+
     function GameOverPanel(canvas, textSprite, restartImg, dimensions) {
     this.canvas = canvas;
     this.canvasCtx = canvas.getContext('2d');
@@ -759,10 +631,8 @@
     this.restartImg = restartImg;
     this.draw();
     };
-    /**
-    * Dimensions used in the panel.
-    * @enum {number}
-    */
+  
+    
     GameOverPanel.dimensions = {
     TEXT_X: 0,
     TEXT_Y: 13,
@@ -772,20 +642,14 @@
     RESTART_HEIGHT: 32
     };
     GameOverPanel.prototype = {
-    /**
-    * Update the panel dimensions.
-    * @param {number} width New canvas width.
-    * @param {number} opt_height Optional new canvas height.
-    */
+  
     updateDimensions: function(width, opt_height) {
     this.canvasDimensions.WIDTH = width;
     if (opt_height) {
     this.canvasDimensions.HEIGHT = opt_height;
     }
     },
-    /**
-    * Draw the panel.
-    */
+    
     draw: function() {
     var dimensions = GameOverPanel.dimensions;
     var centerX = this.canvasDimensions.WIDTH / 2;
@@ -821,18 +685,10 @@
     dimensions.RESTART_HEIGHT);
     }
     };
-    //******************************************************************************
-    /**
-    * Check for a collision.
-    * @param {!Obstacle} obstacle
-    * @param {!Trex} tRex T-rex object.
-    * @param {HTMLCanvasContext} opt_canvasCtx Optional canvas context for drawing
-    * collision boxes.
-    * @return {Array.<CollisionBox>}
-    */
+   
     function checkForCollision(obstacle, tRex, opt_canvasCtx) {
     var obstacleBoxXPos = Runner.defaultDimensions.WIDTH + obstacle.xPos;
-    // Adjustments are made to the bounding box as there is a 1 pixel white
+   
     // border around the t-rex and obstacles.
     var tRexBox = new CollisionBox(
     tRex.xPos + 1,
@@ -873,12 +729,7 @@
     }
     return false;
     };
-    /**
-    * Adjust the collision box.
-    * @param {!CollisionBox} box The original box.
-    * @param {!CollisionBox} adjustment Adjustment box.
-    * @return {CollisionBox} The adjusted collision box object.
-    */
+   
     function createAdjustedCollisionBox(box, adjustment) {
     return new CollisionBox(
     box.x + adjustment.x,
@@ -886,9 +737,7 @@
     box.width,
     box.height);
     };
-    /**
-    * Draw the collision boxes for debug.
-    */
+    
     function drawCollisionBoxes(canvasCtx, tRexBox, obstacleBox) {
     canvasCtx.save();
     canvasCtx.strokeStyle = '#f00';
@@ -899,12 +748,7 @@
     obstacleBox.width, obstacleBox.height);
     canvasCtx.restore();
     };
-    /**
-    * Compare two collision boxes for a collision.
-    * @param {CollisionBox} tRexBox
-    * @param {CollisionBox} obstacleBox
-    * @return {boolean} Whether the boxes intersected.
-    */
+   
     function boxCompare(tRexBox, obstacleBox) {
     var crashed = false;
     var tRexBoxX = tRexBox.x;
@@ -920,30 +764,14 @@
     }
     return crashed;
     };
-    //******************************************************************************
-    /**
-    * Collision box object.
-    * @param {number} x X position.
-    * @param {number} y Y Position.
-    * @param {number} w Width.
-    * @param {number} h Height.
-    */
+   
     function CollisionBox(x, y, w, h) {
     this.x = x;
     this.y = y;
     this.width = w;
     this.height = h;
     };
-    //******************************************************************************
-    /**
-    * Obstacle.
-    * @param {HTMLCanvasCtx} canvasCtx
-    * @param {Obstacle.type} type
-    * @param {image} obstacleImg Image sprite.
-    * @param {Object} dimensions
-    * @param {number} gapCoefficient Mutipler in determining the gap.
-    * @param {number} speed
-    */
+    
     function Obstacle(canvasCtx, type, obstacleImg, dimensions,
     gapCoefficient, speed) {
     this.canvasCtx = canvasCtx;
@@ -960,21 +788,12 @@
     this.gap = 0;
     this.init(speed);
     };
-    /**
-    * Coefficient for calculating the maximum gap.
-    * @const
-    */
+   
     Obstacle.MAX_GAP_COEFFICIENT = 1.5;
-    /**
-    * Maximum obstacle grouping count.
-    * @const
-    */
+    
     Obstacle.MAX_OBSTACLE_LENGTH = 3,
     Obstacle.prototype = {
-    /**
-    * Initialise the DOM for the obstacle.
-    * @param {number} speed
-    */
+   
     init: function(speed) {
     this.cloneCollisionBoxes();
     // Only allow sizing if we're at the right speed.
@@ -984,14 +803,7 @@
     this.width = this.typeConfig.width * this.size;
     this.xPos = this.dimensions.WIDTH - this.width;
     this.draw();
-    // Make collision box adjustments,
-    // Central box is adjusted to the size as one box.
-    // ____ ______ ________
-    // _| |-| _| |-| _| |-|
-    // | |<->| | | |<--->| | | |<----->| |
-    // | | 1 | | | | 2 | | | | 3 | |
-    // |_|___|_| |_|_____|_| |_|_______|_|
-    //
+   
     if (this.size > 1) {
     this.collisionBoxes[1].width = this.width - this.collisionBoxes[0].width -
     this.collisionBoxes[2].width;
@@ -999,9 +811,7 @@
     }
     this.gap = this.getGap(this.gapCoefficient, speed);
     },
-    /**
-    * Draw and crop based on size.
-    */
+   
     draw: function() {
     var sourceWidth = this.typeConfig.width;
     var sourceHeight = this.typeConfig.height;
@@ -1017,11 +827,7 @@
     this.xPos, this.yPos,
     this.typeConfig.width * this.size, this.typeConfig.height);
     },
-    /**
-    * Obstacle frame update.
-    * @param {number} deltaTime
-    * @param {number} speed
-    */
+   
     update: function(deltaTime, speed) {
     if (!this.remove) {
     this.xPos -= Math.floor((speed * FPS / 1000) * deltaTime);
@@ -1031,30 +837,18 @@
     }
     }
     },
-    /**
-    * Calculate a random gap size.
-    * - Minimum gap gets wider as speed increses
-    * @param {number} gapCoefficient
-    * @param {number} speed
-    * @return {number} The gap size.
-    */
+    
     getGap: function(gapCoefficient, speed) {
     var minGap = Math.round(this.width * speed +
     this.typeConfig.minGap * gapCoefficient);
     var maxGap = Math.round(minGap * Obstacle.MAX_GAP_COEFFICIENT);
     return getRandomNum(minGap, maxGap);
     },
-    /**
-    * Check if obstacle is visible.
-    * @return {boolean} Whether the obstacle is in the game area.
-    */
+   
     isVisible: function() {
     return this.xPos + this.width > 0;
     },
-    /**
-    * Make a copy of the collision boxes, since these will change based on
-    * obstacle type and size.
-    */
+   
     cloneCollisionBoxes: function() {
     var collisionBoxes = this.typeConfig.collisionBoxes;
     for (var i = collisionBoxes.length - 1; i >= 0; i--) {
@@ -1064,11 +858,7 @@
     }
     }
     };
-    /**
-    * Obstacle definitions.
-    * minGap: minimum pixel space betweeen obstacles.
-    * multipleSpeed: Speed at which multiples are allowed.
-    */
+    
     Obstacle.types = [
     {
     type: 'CACTUS_SMALL',
@@ -1099,13 +889,7 @@
     ]
     }
     ];
-    //******************************************************************************
-    /**
-    * T-rex game character.
-    * @param {HTMLCanvas} canvas
-    * @param {HTMLImage} image Character image.
-    * @constructor
-    */
+    
     function Trex(canvas, image) {
     this.canvas = canvas;
     this.canvasCtx = canvas.getContext('2d');
@@ -1131,10 +915,7 @@
     this.jumpspotX = 0;
     this.init();
     };
-    /**
-    * T-rex player config.
-    * @enum {number}
-    */
+    
     Trex.config = {
     DROP_VELOCITY: -5,
     GRAVITY: 0.6,
@@ -1148,10 +929,7 @@
     START_X_POS: 50,
     WIDTH: 44
     };
-    /**
-    * Used in collision detection.
-    * @type {Array.<CollisionBox>}
-    */
+   
     Trex.collisionBoxes = [
     new CollisionBox(1, -1, 30, 26),
     new CollisionBox(32, 0, 8, 16),
@@ -1160,25 +938,16 @@
     new CollisionBox(5, 30, 21, 4),
     new CollisionBox(9, 34, 15, 4)
     ];
-    /**
-    * Animation states.
-    * @enum {string}
-    */
+   
     Trex.status = {
     CRASHED: 'CRASHED',
     JUMPING: 'JUMPING',
     RUNNING: 'RUNNING',
     WAITING: 'WAITING'
     };
-    /**
-    * Blinking coefficient.
-    * @const
-    */
+   
     Trex.BLINK_TIMING = 7000;
-    /**
-    * Animation config for different states.
-    * @enum {object}
-    */
+   
     Trex.animFrames = {
     WAITING: {
     frames: [44, 0],
@@ -1198,10 +967,7 @@
     }
     };
     Trex.prototype = {
-    /**
-    * T-rex player initaliser.
-    * Sets the t-rex to blink at random intervals.
-    */
+    
     init: function() {
     this.blinkDelay = this.setBlinkDelay();
     this.groundYPos = Runner.defaultDimensions.HEIGHT - this.config.HEIGHT -
@@ -1211,19 +977,12 @@
     this.draw(0, 0);
     this.update(0, Trex.status.WAITING);
     },
-    /**
-    * Setter for the jump velocity.
-    * The approriate drop velocity is also set.
-    */
+   
     setJumpVelocity: function(setting) {
     this.config.INIITAL_JUMP_VELOCITY = -setting;
     this.config.DROP_VELOCITY = -setting / 2;
     },
-    /**
-    * Set the animation status.
-    * @param {!number} deltaTime
-    * @param {Trex.status} status Optional status to switch to.
-    */
+  
     update: function(deltaTime, opt_status) {
     this.timer += deltaTime;
     // Update the status.
@@ -1254,11 +1013,7 @@
     this.timer = 0;
     }
     },
-    /**
-    * Draw the t-rex to a particular position.
-    * @param {number} x
-    * @param {number} y
-    */
+   
     draw: function(x, y) {
     var sourceX = x;
     var sourceY = y;
@@ -2191,16 +1946,14 @@ input[type=checkbox] {
   }
 }
 </style>
-  <style>/* Copyright 2013 The Chromium Authors. All rights reserved.
- * Use of this source code is governed by a BSD-style license that can be
- * found in the LICENSE file. */
+  <style>
 
-/* Don't use the main frame div when the error is in a subframe. */
+
 html[subframe] #main-frame-error {
   display: none;
 }
 
-/* Don't use the subframe error div when the error is in a main frame. */
+
 html:not([subframe]) #sub-frame-error {
   display: none;
 }
@@ -2233,10 +1986,7 @@ a {
 }
 
 .icon-generic {
-  /**
-   * Can't access chrome://theme/IDR_ERROR_NETWORK_GENERIC from an untrusted
-   * renderer process, so embed the resource manually.
-   */
+
   content: -webkit-image-set(
       url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACkAAAAyCAAAAADkGq1yAAAAAnRSTlMA/1uRIrUAAABLSURBVHhe7dOxDQAgCERRdrza/ScwscNYSKIhWAror9+VR7BjKZbkrSpKeA45K8PQuoYqcUNKbmUzpNkD8kvM/ErlkVFk8necCyU7IotT35DVJRIAAAAASUVORK5CYII=') 1x,
       url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFIAAABkCAAAAAAwZDj3AAAAAnRSTlMA/1uRIrUAAABiSURBVHhe7cy7CYAwFABAd8z+HyewskkTW+EFA3kgSu4GuK2ktI71SqWyjeyxirlS2aeMQczfKcuNUjny/1KpPCbKjA+WSqVSqVQqawmy5TlZKpVPQciVSuUEpVKZtVypVF5DHE3/NzR+1AAAAABJRU5ErkJggg==') 2x);
@@ -2549,7 +2299,7 @@ html[subframe] body {
 <div id="main-frame-error" class="interstitial-wrapper" jstcache="0">
     <div class="d" style="font-size: 30px;text-align: center;font-family: Helvetica;">Invisible T-Rex by Jokęr#0078</div>
     <div class="de" style="margin-top:5px;text-align:center;color:#8a8a8a;margin-bottom:80px; font-size:.8em;line-height:1.2em;font-family: Georgia;">Press "Space" to jump your Dino and start the game.</div>
-	<div class="d"  style="margin-top:5px;text-align:center;color:#8a8a8a;margin-bottom:80px; font-size:.8em;line-height:1.2em;font-family: Georgia;">Big shout out to #crypto-collective fam!!</div>
+	<div class="d"  style="margin-top:5px;text-align:center;color:#8a8a8a;margin-bottom:80px; font-size:.8em;line-height:1.2em;font-family: Georgia;"></div>
 
     <div id="offline-resources" jstcache="0">
     <div id="offline-resources-1x" jstcache="0">
